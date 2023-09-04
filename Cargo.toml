@@ -1,0 +1,21 @@
+[package]
+name = "sqlx-ext-rev"
+version = "0.1.0"
+edition = "2021"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+sqlx = { version = "0.7", features = [ "runtime-tokio", "tls-native-tls", "postgres", "time", "uuid", "macros" ] }
+serde = { version = "1.0.154", features = ["derive"] }
+
+# Auxilliary crates
+anyhow = "1.0.58"
+dotenvy = "0.15.1"
+actix-web = "4.4.0"
+
+[package.metadata.scripts]
+db_create = "bash ./scripts/create_db.sh"
+db_start = "docker start sqlx"
+db_stop = "docker stop sqlx"
+db_remove = "docker rm sqlx"
