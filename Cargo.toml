@@ -13,6 +13,7 @@ serde = { version = "1.0.154", features = ["derive"] }
 anyhow = "1.0.58"
 dotenvy = "0.15.1"
 actix-web = "4.4.0"
+dotenvy_macro = "0.15.7"
 
 [package.metadata.scripts]
 db_create = "bash ./scripts/create_db.sh"
