@@ -1,5 +1,6 @@
 use actix_web::{web, App, HttpServer, http::header::ContentType, HttpResponse};
 use sqlx::postgres::{ PgPool, PgPoolOptions, PgRow };
+use sqlx::*;
 use dotenvy_macro::dotenv;
 use std::env;
 
@@ -11,7 +12,7 @@ struct AppState {
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenvy::dotenv().ok();
-    let pg_uri: &'static str = dotenv!("PG_URL");
+    let pg_uri: &'static str = dotenv!("DATABASE_URL");
     let pool = PgPoolOptions::new()
         .max_connections(5)
         .connect(pg_uri).await.unwrap();
@@ -35,10 +36,16 @@ async fn root() -> String {
 async fn get_user(path: web::Path<usize>, app_state: web::Data::<AppState>) -> HttpResponse {
     let user_id: usize = path.into_inner();
 
-    let user:  Result<Option<PgRow>, sqlx::Error> = sqlx::query("SELECT * FROM users WHERE id = ?")
-        .bind(user_id as i32)
-        .fetch_optional(&app_state.pool)
-        .await;
+    #[derive(sqlx::FromRow)]
+    struct User {
+        user_id: i32,
+        username: String,
+    }
+
+    let user: sqlx::Result<Option<User>> = sqlx::query_as!(
+        User,
+        "SELECT user_id, username FROM users WHERE user_id = 1;"
+    ).fetch_optional(&app_state.pool).await;
 
     HttpResponse::Ok()
         .content_type(ContentType::plaintext())
